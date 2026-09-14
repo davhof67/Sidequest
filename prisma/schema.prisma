@@ -10,18 +10,28 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
-  posts     Post[]
+
+  displayName String
+  passwordHash String
+  avatarUrl String?
+
+  createdQuests Quest[] @relation("CreatedQuests")
+
+  joinedQuests  Quest[] @relation("QuestParticipants")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Post {
+model Quest {
   id        String   @id @default(cuid())
   title     String
-  content   String?
+  descriptionb       String?
   published Boolean  @default(false)
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
+  maxParicipants Int
+  participants User[] @relation(QuestParticipants)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
