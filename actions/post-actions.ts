@@ -3,9 +3,9 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
-export async function createPost(formData: FormData) {
+export async function createQuest(formData: FormData) {
     const title = formData.get('title') as string
-    const content = formData.get('content') as string
+    const description = formData.get('description') as string
     const authorEmail = formData.get('email') as string
 
     if (!title || !authorEmail) {
@@ -15,17 +15,21 @@ export async function createPost(formData: FormData) {
     const user = await prisma.user.upsert({
         where: { email: authorEmail },
         update: {},
-        create: { email: authorEmail },
-    })
-
-    await prisma.post.create({
-        data: {
-            title,
-            content,
-            authorId: user.id,
-            published: true,
+        create: { email: authorEmail,
+            displayName: '',
+            passwordHash: '',
         },
     })
 
-    revalidatePath('/posts')
+    await prisma.quest.create({
+        data: {
+            title,
+            description,
+            authorId: user.id,
+            published: true,
+            maxParicipants: 10,
+        },
+    })
+
+    revalidatePath('/quest')
 }
